@@ -125,13 +125,16 @@ namespace UnityStandardAssets.Vehicles.Car
             set { m_SteerAngle = value; }
         }
 
-        public float CurrentSpeed{ get { return m_Rigidbody.velocity.magnitude * 2.23693629f; } }
+		public float CurrentSpeed{ get { return FlatVelocity.magnitude * 2.23693629f; } }
 
         public float MaxSpeed{ get { return m_Topspeed; } }
 
         public float Revs { get; private set; }
 
         public float AccelInput { get; set; }
+
+		Vector3 FlatVelocity { get { return new Vector3 ( m_Rigidbody.velocity.x, 0, m_Rigidbody.velocity.z ); } }
+		Vector3 VerticalVelocity { get { return new Vector3 ( 0, m_Rigidbody.velocity.y, 0 ); } }
 
         // Use this for initialization
         private void Start ()
@@ -252,21 +255,32 @@ namespace UnityStandardAssets.Vehicles.Car
             TractionControl ();
         }
 
+		public bool IsGrounded ()
+		{
+			int groundedWheelCount = 0;
+			foreach ( WheelCollider c in m_WheelColliders )
+				if ( c.isGrounded )
+					groundedWheelCount++;
+
+//			Debug.Log ( "ground count " + groundedWheelCount );
+			return groundedWheelCount > 1;
+		}
+
         private void CapSpeed ()
         {
-            float speed = m_Rigidbody.velocity.magnitude;
+			float speed = FlatVelocity.magnitude;
             switch (m_SpeedType) {
             case SpeedType.MPH:
 
                 speed *= 2.23693629f;
                 if (speed > m_Topspeed)
-                    m_Rigidbody.velocity = (m_Topspeed / 2.23693629f) * m_Rigidbody.velocity.normalized;
+					m_Rigidbody.velocity = VerticalVelocity + (m_Topspeed / 2.23693629f) * FlatVelocity.normalized;
                 break;
 
             case SpeedType.KPH:
                 speed *= 3.6f;
                 if (speed > m_Topspeed)
-                    m_Rigidbody.velocity = (m_Topspeed / 3.6f) * m_Rigidbody.velocity.normalized;
+					m_Rigidbody.velocity = VerticalVelocity + (m_Topspeed / 3.6f) * FlatVelocity.normalized;
                 break;
             }
         }
@@ -297,7 +311,7 @@ namespace UnityStandardAssets.Vehicles.Car
             }
 
             for (int i = 0; i < 4; i++) {
-                if (CurrentSpeed > 5 && Vector3.Angle (transform.forward, m_Rigidbody.velocity) < 50f) {
+				if (CurrentSpeed > 5 && Vector3.Angle (transform.forward, FlatVelocity) < 50f) {// m_Rigidbody.velocity) < 50f) {
                     m_WheelColliders [i].brakeTorque = m_BrakeTorque * footbrake;
                 } else if (footbrake > 0) {
                     m_WheelColliders [i].brakeTorque = 0f;
@@ -320,7 +334,7 @@ namespace UnityStandardAssets.Vehicles.Car
             if (Mathf.Abs (m_OldRotation - transform.eulerAngles.y) < 10f) {
                 var turnadjust = (transform.eulerAngles.y - m_OldRotation) * m_SteerHelper;
                 Quaternion velRotation = Quaternion.AngleAxis (turnadjust, Vector3.up);
-                m_Rigidbody.velocity = velRotation * m_Rigidbody.velocity;
+				m_Rigidbody.velocity = VerticalVelocity+ velRotation * FlatVelocity;
             }
             m_OldRotation = transform.eulerAngles.y;
         }

@@ -14,6 +14,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public bool Cruising { get; private set; } // cruise control
 		public bool mouse_hold;
 		public float mouse_start;
+		public bool isTrainingMode;
 
         // Use this for initialization
         public void Start()
@@ -28,7 +29,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public void UpdateValues()
         {
             // Cruise Control
-            if (Input.GetKeyDown(KeyCode.Space))
+			if (Input.GetKeyDown(KeyCode.Space) && !isTrainingMode)
             {
                 Cruising = !Cruising;
             }
