@@ -8,6 +8,10 @@ All the assets in this repository require Unity. Please follow the instructions 
 
 Instructions: Download the zip file, extract it and run the exectution file.
 
+Jumping Car, 2/16/17
+[Windows 32](https://drive.google.com/file/d/0B_to1kkn2aSAcE1pRGtoNkg3dEE/view?usp=sharing)
+
+
 Version 2, 2/07/17
 
 [Linux](https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58983558_beta-simulator-linux/beta-simulator-linux.zip)
